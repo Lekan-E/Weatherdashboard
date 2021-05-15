@@ -59,19 +59,19 @@ var formSubmitHandler = function (event) {
 
 //function to get the weather foecast of the day
 var getWeather = function (name) {
-    var apiUrl = 'https://api.openweathermap.org/data/2.5/weather?q=' + name + '&appid=' + apiKey;
+    var apiUrl = 'https://api.openweathermap.org/data/2.5/weather?q=' + name + '&appid=' + apiKey + '&units=metric';
 
     fetch(apiUrl)
         .then(function (response) {
             return response.json();
         })
         .then(function (data) {
-
+            console.log(data)
             currentLocation.textContent = data.name + ", " + data.sys.country
             currentDate.textContent = new Date(data.dt * 1000).toLocaleDateString("en-US")
             document.querySelector('#weather-icon').src = 'https://openweathermap.org/img/wn/' + data.weather[0].icon + '@2x.png'
             currentHumid.textContent = data.main.humidity //access the humidity data
-            currentTemp.textContent = convert(data.main.temp) //access the main temperature data
+            currentTemp.textContent = data.main.temp //access the main temperature data
             currentWind.textContent = data.wind.speed //access the wind speed data
             weather.lat = data.coord.lat
             weather.lon = data.coord.lon
@@ -145,9 +145,10 @@ var getforecast = function (name) {
                 temperature[i].children[2].textContent = "Humidity: " + data.list[weatherIndex].main.humidity + "%"
 
                 //change the html element text to the temperature value
-                temperature[i].children[3].textContent = 'Temp: ' + convert(data.list[weatherIndex].main.temp) + "°C"
+                temperature[i].children[3].textContent = 'Temp: ' + data.list[weatherIndex].main.temp + "°C"
 
-                temperature[i].children[3].textContent = 'Wind Speed: ' + convert(data.list[weatherIndex].wind.speed) + "km/hr"
+                //temperature[i].children[3].textContent = 'Wind Speed: ' + convert(data.list[weatherIndex].wind.speed) + "m/s"
+                
 
 
                 weatherIndex += 8 //increase the weather index by every 8 arrays (8 arrays per day)
