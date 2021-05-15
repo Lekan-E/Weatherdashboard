@@ -12,9 +12,9 @@ var currentUV = document.querySelector("#uvIndex")
 var cnt = 5;
 
 var weather = {
-    lat:'',
-    lon:'',
-    city:''
+    lat: '',
+    lon: '',
+    city: ''
 }
 
 //convert temperature from Fahrenheit to Celcius
@@ -24,7 +24,7 @@ function convert(value) {
 }
 
 //eventhandler to alert user if the box is empty
-var formSubmitHandler = function(event) {
+var formSubmitHandler = function (event) {
     event.preventDefault();
 
     var stamps = document.querySelectorAll(".days")
@@ -40,8 +40,13 @@ var formSubmitHandler = function(event) {
     } else {
         return
     }
+    const citiesArr = localStorage.getItem('cities') || '[]';
+    storedCities = JSON.parse(citiesArr);
+    storedCities.push(name);
+    addList(name)
+    localStorage.setItem('cities', JSON.stringify(storedCities));
+    
     //store searched city to local storage
-    localStorage.setItem('city', name)
     cityName.value = ''
 
     //store searched city to a list
@@ -49,19 +54,19 @@ var formSubmitHandler = function(event) {
 
     //get the current weather of the searched city
     getWeather(name)
-    
+
 }
 
 //function to get the weather foecast of the day
-var getWeather = function(name){
+var getWeather = function (name) {
     var apiUrl = 'https://api.openweathermap.org/data/2.5/weather?q=' + name + '&appid=' + apiKey;
 
     fetch(apiUrl)
-        .then(function(response){
+        .then(function (response) {
             return response.json();
         })
-        .then(function(data){
-            
+        .then(function (data) {
+
             currentLocation.textContent = data.name + ", " + data.sys.country
             currentDate.textContent = new Date(data.dt * 1000).toLocaleDateString("en-US")
             document.querySelector('#weather-icon').src = 'https://openweathermap.org/img/wn/' + data.weather[0].icon + '@2x.png'
@@ -71,22 +76,22 @@ var getWeather = function(name){
             weather.lat = data.coord.lat
             weather.lon = data.coord.lon
             weather.city = data.name
-        }).then(()=>{
+        }).then(() => {
             getIndex(weather.lat, weather.lon)
-        }).then(()=>{
+        }).then(() => {
             getforecast(weather.city)
         })
-    }
+}
 
 //function to get the uv index number from lat and long 
-var getIndex = function(latitude,longitude){
-    var apiUrl = 'https://api.openweathermap.org/data/2.5/weather?lat=' + latitude + '&lon=' + longitude + '&appid=' + apiKey;
+var getIndex = function (latitude, longitude) {
+    var apiUrl = 'https://api.openweathermap.org/data/2.5/weather?lat=' + latitude + '&lon=' + longitude + '&appid=' + apiKey + '&units=metric';
 
     fetch(apiUrl)
-        .then(function(response){
+        .then(function (response) {
             return response.json()
         })
-        .then(function(data){
+        .then(function (data) {
             currentUV.textContent = ''
 
             var uvNum = data.nodeValue
@@ -112,14 +117,14 @@ var getIndex = function(latitude,longitude){
 }
 
 //function to generate the forecast for the next 5 days
-var  getforecast = function(name){
-    var apiUrl = 'https://api.openweathermap.org/data/2.5/forecast?q=' + name + '&appid=' + apiKey;
+var getforecast = function (name) {
+    var apiUrl = 'https://api.openweathermap.org/data/2.5/forecast?q=' + name + '&appid=' + apiKey + '&units=metric';
 
     fetch(apiUrl)
-        .then(function(response){
+        .then(function (response) {
             return response.json()
         })
-        .then(function(data){
+        .then(function (data) {
             console.log(data)
             var temperature = document.querySelectorAll(".days");
 
@@ -140,7 +145,10 @@ var  getforecast = function(name){
                 temperature[i].children[2].textContent = "Humidity: " + data.list[weatherIndex].main.humidity + "%"
 
                 //change the html element text to the temperature value
-                temperature[i].children[3].textContent = 'Temp: ' + convert(data.list[weatherIndex].main.temp) + "°F"
+                temperature[i].children[3].textContent = 'Temp: ' + convert(data.list[weatherIndex].main.temp) + "°C"
+
+                temperature[i].children[3].textContent = 'Wind Speed: ' + convert(data.list[weatherIndex].wind.speed) + "km/hr"
+
 
                 weatherIndex += 8 //increase the weather index by every 8 arrays (8 arrays per day)
                 day++ //increase the day count
@@ -151,11 +159,11 @@ var  getforecast = function(name){
 
 
 //fucntion to add a city to the history
-var addList = function(temp) { 
+var addList = function (temp) {
     var item = document.createElement('li')
     item.classList.add('list-group-item')
     item.textContent = temp;
-    item.addEventListener('click', function(event){
+    item.addEventListener('click', function (event) {
         var item = event.target.textContent
         var stamps = document.querySelectorAll(".days")
         getWeather(item)
@@ -167,7 +175,14 @@ var addList = function(temp) {
 searchButton.addEventListener('click', formSubmitHandler)
 
 //display the last recently searched city when page
-const lcity = localStorage.getItem('city')
-if (lcity) {
-    getWeather(lcity)
+let citiesArr = localStorage.getItem('cities');
+if (citiesArr) {
+    storedCities = JSON.parse(citiesArr);
+    getWeather(storedCities[0])
+    storedCities.forEach(city => {
+        addList(city)
+    })
+} else {
+    getWeather("Lagos")
+    addList("Lagos")
 }
