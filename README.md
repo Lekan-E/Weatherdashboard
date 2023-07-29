@@ -1,10 +1,10 @@
 # Weatherdashboard
-My weather dashboard project is used to retrieve data from the OpenWeaherAPI. 
+My weather dashboard project is used to retrieve data from the OpenWeatherAPI. 
 This website displays a 5-day weather forecast for the desired city.
 
 How To User
 1. Enter your desired City name and hit 'search'
-2. If the city it valid, it will display the current weather forcast, which includes the Temperature, Humidity and Wind Speed.
+2. If the city is valid, it will display the current weather forecast, which includes the Temperature, Humidity and Wind Speed.
 3. If the page is refreshed, the most recent search remains displayed.
 
 Screenshot of the page
